@@ -16,7 +16,7 @@ def testCronJob():
 
 @bp.route('/', methods=['POST'])
 def createCronJob():
-    scheduler.add_job(testCronJob, 'date', run_date='2024-04-26 18:03:00')
+    scheduler.add_job(testCronJob, 'date', run_date='2024-04-27 08:30:00')
     return json.dumps({"message": "add cron job success"}), 200, {'ContentType':'application/json'}
 
 @bp.route('/', methods=['PUT'])
