@@ -32,7 +32,7 @@ def message(client, feed_id, payload):
     # The feed_id parameter identifies the feed, and the payload parameter has
     # the new value.
     print('Feed {0} received new value: {1}'.format(feed_id, payload))
-    socketio.emit('new_temp', {'message': payload})
+    socketio.emit(feed_id, {'message': payload})
 
     # if payload > "30" and db.Fan.find({})[0]["status"] == "off":
     #     print('heat hight')
