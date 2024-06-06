@@ -3,18 +3,29 @@ import json
 from flask import request
 from app.cron_jobs import bp
 from app.cron_jobs.cronJobUsecases import createBackgroundJob
+from app.cron_jobs.dependency_injections.dependency_container import  taskRepository
+from app.cron_jobs.usecases.create_task_usecase import CreateTaskUsecase, CreateTaskUsecaseInput
 from app.jobSchedulerConnection import scheduler
 
 
-@bp.route('/task', methods=['POST'])
-def createIotTask():
+@bp.route('/', methods=['POST'])
+def createTask():
+    createTaskObj = {}
     request_data = request.get_json()
+    for key in request_data.keys():
+        createTaskObj[key] = request_data[key]
 
-    task = {
-        'action': request_data["action"],
-        'cronType': request_data["taskType"],
-        'timeObject': request_data["timeObject"]
-    }
+    createTaskUsecaseInput = CreateTaskUsecaseInput(createTaskObj)
+    createTaskUsecase = CreateTaskUsecase(createTaskUsecaseInput, taskRepository)
+
+    task = createTaskUsecase.execute()
+    return json.dumps(
+    {
+        "message": "create task success",
+        "task": task
+    }), 200, {'ContentType':'application/json'}
+    
+
     
     createBackgroundJob(task)
 

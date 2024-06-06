@@ -17,6 +17,7 @@ class DeviceRepositoryUtils:
             deviceDomainModels.append({
                 'name': device.name,
                 'deviceId': device.deviceId,
+                'deviceType': device.deviceType,
                 'createdDate': device.createdDate,
                 'id': device.id
             })
