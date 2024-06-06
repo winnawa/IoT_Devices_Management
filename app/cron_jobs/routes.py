@@ -2,7 +2,23 @@ from datetime import date
 import json
 from flask import request
 from app.cron_jobs import bp
+from app.cron_jobs.cronJobUsecases import createBackgroundJob
 from app.jobSchedulerConnection import scheduler
+
+
+@bp.route('/task', methods=['POST'])
+def createIotTask():
+    request_data = request.get_json()
+
+    task = {
+        'action': request_data["action"],
+        'cronType': request_data["taskType"],
+        'timeObject': request_data["timeObject"]
+    }
+    
+    createBackgroundJob(task)
+
+
 
 
 @bp.route('/', methods=['GET'])
