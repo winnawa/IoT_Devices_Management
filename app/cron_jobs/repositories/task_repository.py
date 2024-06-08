@@ -5,14 +5,6 @@ from app.dataConnection import Task
 
 class TaskRepositoryUtils:
     @staticmethod
-    def createUpdateTaskObj(updateTaskInput):
-        updateDeviceObj={}
-        for key in updateTaskInput:
-            addOnObj = {Task[key]: updateTaskInput[key]}
-            updateTaskInput.update(addOnObj)
-        return updateDeviceObj
-
-    @staticmethod
     def mapToTaskDomainModel(tasks : list):
         taskDomainModels = []
         for task in tasks:
@@ -93,12 +85,14 @@ class TaskRepository:
     def updateTask(self, taskId, updateTaskObj):
         try:
             currentUtcTime = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-            
-            updateObj = TaskRepositoryUtils.createUpdateTaskObj(updateTaskObj)
+            updateObj = {}
+            updateObj.update(updateTaskObj)
             updateObj.update({
                 Task.lastModifiedDate: currentUtcTime
             })
 
+            print("update obj",updateObj)
+            
             q = (Task
                 .update(updateObj)
                 .where(Task.id == taskId))

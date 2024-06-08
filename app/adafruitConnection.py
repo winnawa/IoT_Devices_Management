@@ -38,12 +38,10 @@ def message(client, feed_id, payload):
 
     if feed_id == 'task-result':
         data = json.loads(payload)
-        print(data, "data")
-        print(data.keys())
 
         taskId = data["taskId"]
         state = int(data["state"])
-        print("loaded data: ",taskId, state)
+        # print("loaded data: ",taskId, state)
 
         updateTaskObj = {"state": state}
         upadateTaskUsecaseInput = UpdateTaskUsecaseInput(updateTaskObj, taskId)
