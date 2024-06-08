@@ -1,17 +1,15 @@
 import json
 import sys
 from Adafruit_IO import MQTTClient
+from app.config import ADAFRUIT_IO_KEY, ADAFRUIT_IO_USERNAME
 from app.cron_jobs.usecases.update_task_usecase import UpdateTaskUsecase, UpdateTaskUsecaseInput
+from app.cron_jobs.dependency_injections.dependency_container import taskRepository
 
 from app.socketConnection import socketio
 # Set to your Adafruit IO key.
 # Remember, your key is a secret,
 # so make sure not to publish it when you publish this code!
-ADAFRUIT_IO_KEY = 'aio_aNLa65wORH4kFGivmgZ0WKjb0wTQ'
 
-# Set to your Adafruit IO username.
-# (go to https://accounts.adafruit.com to find your username)
-ADAFRUIT_IO_USERNAME = 'namkhoapham'
 mqttClient = MQTTClient(ADAFRUIT_IO_USERNAME, ADAFRUIT_IO_KEY)
 
 
@@ -22,7 +20,9 @@ def connected(client):
     # calls against it easily.
     print('Connected to Adafruit IO!  Listening for DemoFeed changes...')
     # Subscribe to changes on a feed named DemoFeed.
-    client.subscribe('smart-home.temp')
+    client.subscribe('device')
+    client.subscribe('task-action')
+    client.subscribe('task-result')
 
 def disconnected(client):
     # Disconnected function will be called when the client disconnects.
@@ -37,18 +37,19 @@ def message(client, feed_id, payload):
     socketio.emit(feed_id, {'message': payload})
 
     if feed_id == 'task-result':
-        print(payload)
         data = json.loads(payload)
+        print(data, "data")
+        print(data.keys())
+
         taskId = data["taskId"]
         state = int(data["state"])
+        print("loaded data: ",taskId, state)
 
         updateTaskObj = {"state": state}
         upadateTaskUsecaseInput = UpdateTaskUsecaseInput(updateTaskObj, taskId)
-        updateTaskUsecase = UpdateTaskUsecase(upadateTaskUsecaseInput)
+        updateTaskUsecase = UpdateTaskUsecase(upadateTaskUsecaseInput,taskRepository)
 
         updatedTask = updateTaskUsecase.execute()
-
-
 
     # if payload > "30" and db.Fan.find({})[0]["status"] == "off":
     #     print('heat hight')

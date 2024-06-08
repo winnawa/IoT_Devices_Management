@@ -16,13 +16,14 @@ class PushTaskToFeedServiceUtils:
             }    
 
 class PushTaskToFeedService:
+    mqttClient = None
     def __init__(self, mqttClient):
-        self.mqttClient = mqttClient
-    @staticmethod
-    def execute(serializedActionId, serializedTaskId):
+        PushTaskToFeedService.mqttClient = mqttClient
+    # @staticmethod
+    def execute(self,serializedActionId, serializedTaskId):
         actionId = json.loads(serializedActionId)
         taskId = json.loads(serializedTaskId)
 
         actionObj = PushTaskToFeedServiceUtils.getActionFormat(actionId,taskId)
         jsonifyDataFormat = json.dumps(actionObj)
-        mqttClient.publish('task-action',jsonifyDataFormat)
+        PushTaskToFeedService.mqttClient.publish('task-action',jsonifyDataFormat)

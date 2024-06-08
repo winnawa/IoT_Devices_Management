@@ -1,7 +1,7 @@
 import json
 import requests
 
-from app.adafruitConnection import ADAFRUIT_IO_KEY, ADAFRUIT_IO_USERNAME
+from app.config import ADAFRUIT_IO_KEY, ADAFRUIT_IO_USERNAME
 
 class GetDeviceDatasServiceUtils:
     def __init__(self):
