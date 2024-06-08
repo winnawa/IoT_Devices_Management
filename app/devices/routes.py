@@ -6,14 +6,14 @@ from app.devices.usecases.create_device_usecase import CreateDeviceUsecaseInput,
 from app.devices.usecases.delete_device_information_usecase import DeleteDeviceInformationUsecase, DeleteDeviceInformationUsecaseInput
 from app.devices.usecases.get_device_information_usecase import GetDeviceInformationUsecase, GetDeviceInformationUsecaseInput
 from app.devices.usecases.get_devices_information_usecase import GetDevicesInformationUsecaseInput, GetDevicesInformationUsecase
-from app.devices.dependency_injections.dependency_container import deviceRepository, getDeviceDataService
+from app.devices.dependency_injections.dependency_container import deviceRepository, getDeviceDatasService
 
 @bp.route('/', methods=['GET'])
 def getDevices():
     # in the future, the query param can be pass to getDeviceQueryObj
     getDevicesQueryObj = {}
     getDevicesInformationUsecaseInput = GetDevicesInformationUsecaseInput(getDevicesQueryObj)
-    getDevicesInformationUsecase = GetDevicesInformationUsecase(getDevicesInformationUsecaseInput, deviceRepository, getDeviceDataService)
+    getDevicesInformationUsecase = GetDevicesInformationUsecase(getDevicesInformationUsecaseInput, deviceRepository, getDeviceDatasService)
 
     devices = getDevicesInformationUsecase.execute()
     return json.dumps(

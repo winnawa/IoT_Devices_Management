@@ -1,5 +1,7 @@
+import json
 import sys
 from Adafruit_IO import MQTTClient
+from app.cron_jobs.usecases.update_task_usecase import UpdateTaskUsecase, UpdateTaskUsecaseInput
 
 from app.socketConnection import socketio
 # Set to your Adafruit IO key.
@@ -33,6 +35,20 @@ def message(client, feed_id, payload):
     # the new value.
     print('Feed {0} received new value: {1}'.format(feed_id, payload))
     socketio.emit(feed_id, {'message': payload})
+
+    if feed_id == 'task-result':
+        print(payload)
+        data = json.loads(payload)
+        taskId = data["taskId"]
+        state = int(data["state"])
+
+        updateTaskObj = {"state": state}
+        upadateTaskUsecaseInput = UpdateTaskUsecaseInput(updateTaskObj, taskId)
+        updateTaskUsecase = UpdateTaskUsecase(upadateTaskUsecaseInput)
+
+        updatedTask = updateTaskUsecase.execute()
+
+
 
     # if payload > "30" and db.Fan.find({})[0]["status"] == "off":
     #     print('heat hight')

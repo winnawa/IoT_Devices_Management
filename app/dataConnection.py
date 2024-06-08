@@ -23,6 +23,8 @@ class Device(Model):
 class Task(Model):
     description = CharField()
     # "date"== at that time/"interval"== after sometimes/"cron" == time of days
+    state = IntegerField()
+    taskActionId = IntegerField()
     taskType = CharField()
     createdDate = CharField()
     lastModifiedDate = CharField()
@@ -32,4 +34,4 @@ class Task(Model):
 
 sqliteDb.connect()
 
-sqliteDb.create_tables([Device])
+sqliteDb.create_tables([Device,Task])

@@ -1,28 +1,46 @@
+from enum import Enum
 from peewee import *
 from datetime import datetime
 from app.dataConnection import Task
 
 class TaskRepositoryUtils:
     @staticmethod
+    def createUpdateTaskObj(updateTaskInput):
+        updateDeviceObj={}
+        for key in updateTaskInput:
+            addOnObj = {Task[key]: updateTaskInput[key]}
+            updateTaskInput.update(addOnObj)
+        return updateDeviceObj
+
+    @staticmethod
     def mapToTaskDomainModel(tasks : list):
         taskDomainModels = []
         for task in tasks:
             taskDomainModels.append({
                 'description': task.description,
+                'taskActionId': task.taskActionId,
+                'state': task.state,
                 'taskType': task.taskType,
                 'createdDate': task.createdDate,
                 'id': task.id
             })
         return taskDomainModels
-    
+
+class TaskStatus(Enum):
+    FAILED = 1,
+    INPROGRESS = 2,
+    COMPLETED = 3
+    CREATED = 4
+
 class TaskRepository:
     def __init__(self):
         pass
 
     def createTask(self,createTaskInput):
         try:
+            # 4 is state default value
             currentUtcTime = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-            newTask = Task(description=createTaskInput["description"], taskType = createTaskInput["taskType"], createdDate = currentUtcTime, lastModifiedDate = currentUtcTime)
+            newTask = Task(description=createTaskInput["description"], state =  4, taskActionId= createTaskInput["taskActionId"], taskType = createTaskInput["taskType"], createdDate = currentUtcTime, lastModifiedDate = currentUtcTime)
             if newTask.save() > 0:
                 query = (Task
                     .select()
@@ -67,7 +85,27 @@ class TaskRepository:
 
     def deleteTask(self,taskId):
         try:
-            task = Task.get(Task.id == taskId)
-            task.delete_instance()
+            taskDataModel = Task.get(Task.id == taskId)
+            taskDataModel.delete_instance()
         except Exception as error:
             print(error)
+
+    def updateTask(self, taskId, updateTaskObj):
+        try:
+            currentUtcTime = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            
+            updateObj = TaskRepositoryUtils.createUpdateTaskObj(updateTaskObj)
+            updateObj.update({
+                Task.lastModifiedDate: currentUtcTime
+            })
+
+            q = (Task
+                .update(updateObj)
+                .where(Task.id == taskId))
+            q.execute()
+
+            taskDataModel = Task.get(Task.id == taskId)
+            taskDomainModel = TaskRepositoryUtils.mapToTaskDomainModel([taskDataModel])[0]
+            return taskDomainModel
+        except Exception as error:
+            print(error, "inside update task taskRepository")
